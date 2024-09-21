@@ -30,6 +30,8 @@ App Switcher is an Electron-based application that allows users to quickly switc
    npm start
    ```
 
+4. To use the app checkout [usage](https://github.com/Bentlybro/Windows-App-Switcher/tree/main?tab=readme-ov-file#usage)
+
 ## Building the Application
 
 To build the application for your platform, use one of the following commands:
