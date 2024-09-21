@@ -16,7 +16,8 @@ function createWindow() {
     show: false, // Start hidden
     frame: false, // Remove window frame
     transparent: true, // Make window transparent
-    opacity: 0.8, // Set the opacity (0.0 to 1.0)
+    opacity: 1, // Set the opacity (0.0 to 1.0)
+    alwaysOnTop: true, // Keep the window always on top
   });
 
   mainWindow.loadFile('src/index.html');
