@@ -41,4 +41,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     displayWindows(allWindows, resultsContainer, bringWindowToFront);
     currentIndex = -1;
   });
+
+  // Add keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    const items = resultsContainer.children;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      currentIndex = (currentIndex + 1) % items.length;
+      updateSelection();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      currentIndex = (currentIndex - 1 + items.length) % items.length;
+      updateSelection();
+    } else if (e.key === 'Enter' && currentIndex !== -1) {
+      e.preventDefault();
+      const selectedWindow = allWindows[currentIndex];
+      bringWindowToFront(selectedWindow);
+    }
+  });
+
+  function updateSelection() {
+    Array.from(resultsContainer.children).forEach((item, index) => {
+      item.classList.toggle('selected', index === currentIndex);
+    });
+    if (currentIndex !== -1) {
+      resultsContainer.children[currentIndex].scrollIntoView({ block: 'nearest' });
+    }
+  }
 });
