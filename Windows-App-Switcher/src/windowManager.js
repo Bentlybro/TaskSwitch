@@ -37,8 +37,43 @@ function bringWindowToFront(window) {
   }
 }
 
+function toggleFavorite(window) {
+  const favorites = getFavorites();
+  const index = favorites.findIndex(fav => fav.processId === window.owner.processId);
+  if (index === -1) {
+    favorites.push({
+      processId: window.owner.processId,
+      name: window.owner.name
+    });
+  } else {
+    favorites.splice(index, 1);
+  }
+  saveFavorites(favorites);
+}
+
+function getFavorites() {
+  const favoritesJson = localStorage.getItem('favorites');
+  return favoritesJson ? JSON.parse(favoritesJson) : [];
+}
+
+function saveFavorites(favorites) {
+  localStorage.setItem('favorites', JSON.stringify(favorites));
+}
+
+function updateFavorites(allWindows) {
+  const favorites = getFavorites();
+  const updatedFavorites = favorites.filter(fav => 
+    allWindows.some(window => window.owner.processId === fav.processId)
+  );
+  saveFavorites(updatedFavorites);
+  return updatedFavorites;
+}
+
 module.exports = {
   updateWindowList,
   displayWindows,
-  bringWindowToFront
+  bringWindowToFront,
+  toggleFavorite,
+  getFavorites,
+  updateFavorites
 };
