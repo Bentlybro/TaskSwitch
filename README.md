@@ -13,8 +13,8 @@ App Switcher is an Electron-based application that allows users to quickly switc
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/app-switcher.git
-   cd app-switcher
+   git clone https://github.com/Bentlybro/Windows-App-Switcher.git
+   cd Windows-App-Switcher
    ```
 
 2. Install dependencies:
