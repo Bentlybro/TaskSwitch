@@ -1,0 +1,46 @@
+{
+  "name": "app-switcher",
+  "version": "1.0.0",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder build --win --mac --linux",
+    "build:win": "electron-builder build --win",
+    "build:mac": "electron-builder build --mac",
+    "build:linux": "electron-builder build --linux"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "electron": "^32.1.2"
+  },
+  "dependencies": {
+    "active-win": "^8.2.1",
+    "node-window-manager": "^2.2.4",
+    "ps-list": "^8.1.1",
+    "ref-napi": "^3.0.3"
+  },
+  "build": {
+    "appId": "com.Bentlybro.appswitcher",
+    "productName": "App Switcher",
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.utilities"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ]
+    }
+  }
+}
