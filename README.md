@@ -56,7 +56,7 @@ To build the application for your platform, use one of the following commands:
 1. Launch the application.
 2. Use the global shortcut `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS) to open the App Switcher window.
 3. Type in the search bar to filter open applications.
-4. Click on an application in the list or use arrow keys and Enter to switch to it.
+4. Click on an application in the list to switch to it.
 5. The App Switcher window will automatically hide when you switch to an application or click outside the window.
 
 ## Current Capabilities
