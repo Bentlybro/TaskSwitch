@@ -2,14 +2,40 @@ const { ipcRenderer } = require('electron');
 const { exec } = require('child_process');
 const activeWin = require('active-win');
 const { windowManager } = require('node-window-manager');
+const si = require('systeminformation');
+const os = require('os');
 
 document.addEventListener('DOMContentLoaded', async () => {
   const searchInput = document.getElementById('search');
   const resultsContainer = document.getElementById('results');
+  const sysInfoContainer = document.getElementById('sysInfo');
   let currentIndex = -1;
 
   // Focus the search input when the window opens
   searchInput.focus();
+
+  // Update system info
+  updateSystemInfo();
+  setInterval(updateSystemInfo, 1000); // Update every second
+
+  async function updateSystemInfo() {
+    const cpu = await si.currentLoad();
+    const mem = await si.mem();
+    
+    sysInfoContainer.innerHTML = `
+      CPU: ${cpu.currentLoad.toFixed(1)}% | 
+      RAM: ${((mem.used / mem.total) * 100).toFixed(1)}% (${formatBytes(mem.used)} / ${formatBytes(mem.total)})
+    `;
+  }
+
+  function formatBytes(bytes, decimals = 2) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  }
 
   // Listen for the focus-search-input event
   ipcRenderer.on('focus-search-input', () => {
