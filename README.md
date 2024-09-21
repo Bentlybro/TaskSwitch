@@ -9,7 +9,7 @@ App Switcher is an Electron-based application that allows users to quickly switc
 - Global shortcut: Activate the app switcher from anywhere using a keyboard shortcut
 - Cross-platform: Works on Windows, macOS, and Linux
 
-![image](https://github.com/user-attachments/assets/39831a68-4582-4e9d-a64d-61a4b0d4e14b)
+   ![image](https://github.com/user-attachments/assets/39831a68-4582-4e9d-a64d-61a4b0d4e14b)
 
 
 ## Setup Guide
