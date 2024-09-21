@@ -45,41 +45,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  document.addEventListener('keydown', (event) => {
-    const results = resultsContainer.children;
-    if (results.length === 0) return;
-
-    if (event.key === 'ArrowDown') {
-      event.preventDefault(); // Prevent default behavior of moving cursor in input
-      if (currentIndex === -1) {
-        searchInput.blur(); // Remove focus from the search input
-      }
-      currentIndex = (currentIndex + 1) % results.length;
-      updateSelection(results);
-    } else if (event.key === 'ArrowUp') {
-      event.preventDefault(); // Prevent default behavior of moving cursor in input
-      if (currentIndex === -1) {
-        searchInput.blur(); // Remove focus from the search input
-      }
-      currentIndex = (currentIndex - 1 + results.length) % results.length;
-      updateSelection(results);
-    } else if (event.key === 'Enter' && currentIndex >= 0) {
-      const selectedWindow = filteredWindows[currentIndex];
-      bringWindowToFront(selectedWindow);
-    }
-  });
-
-  function updateSelection(results) {
-    Array.from(results).forEach((result, index) => {
-      if (index === currentIndex) {
-        result.classList.add('bg-gray-700');
-        result.scrollIntoView({ block: 'nearest' }); // Ensure the selected item is visible
-      } else {
-        result.classList.remove('bg-gray-700');
-      }
-    });
-  }
-
   function bringWindowToFront(window) {
     console.log(`Attempting to bring window to front: ${window.title} (PID: ${window.owner.processId})`);
     
