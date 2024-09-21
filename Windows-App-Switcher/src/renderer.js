@@ -1,5 +1,4 @@
 const { ipcRenderer } = require('electron');
-const { exec } = require('child_process');
 const activeWin = require('active-win');
 const { windowManager } = require('node-window-manager');
 const si = require('systeminformation');
@@ -10,6 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const resultsContainer = document.getElementById('results');
   const sysInfoContainer = document.getElementById('sysInfo');
   let currentIndex = -1;
+  let filteredWindows = [];
 
   // Focus the search input when the window opens
   searchInput.focus();
@@ -17,6 +17,55 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Update system info
   updateSystemInfo();
   setInterval(updateSystemInfo, 1000); // Update every second
+
+  // Get the active windows and display them
+  async function updateWindowList() {
+    const windows = await activeWin.getOpenWindows();
+    filteredWindows = windows.filter(w => w.owner.name !== 'System');
+    displayWindows(filteredWindows);
+  }
+
+  // Call updateWindowList when the window is shown
+  ipcRenderer.on('window-shown', updateWindowList);
+
+  function displayWindows(windowsToDisplay) {
+    resultsContainer.innerHTML = '';
+    windowsToDisplay.forEach((window, index) => {
+      const windowElement = document.createElement('div');
+      windowElement.textContent = `${window.title} (PID: ${window.owner.processId})`;
+      windowElement.classList.add('p-2', 'hover:bg-gray-700', 'cursor-pointer');
+      windowElement.dataset.index = index;
+      windowElement.addEventListener('click', () => {
+        bringWindowToFront(window);
+      });
+      resultsContainer.appendChild(windowElement);
+    });
+  }
+
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.toLowerCase();
+    currentIndex = -1;
+
+    const matchedWindows = filteredWindows.filter(w => w.title.toLowerCase().includes(query));
+    displayWindows(matchedWindows);
+  });
+
+  function bringWindowToFront(window) {
+    console.log(`Attempting to bring window to front: ${window.title} (PID: ${window.owner.processId})`);
+    
+    const windows = windowManager.getWindows();
+    const windowToFocus = windows.find(w => w.processId === window.owner.processId);
+    
+    if (windowToFocus) {
+      console.log(`Found window: ${windowToFocus.getTitle()} (PID: ${windowToFocus.processId})`);
+      windowToFocus.bringToTop();
+      
+      // Hide the main window instead of minimizing
+      ipcRenderer.send('hide-window');
+    } else {
+      console.log(`Window not found for PID: ${window.owner.processId}`);
+    }
+  }
 
   async function updateSystemInfo() {
     const cpu = await si.currentLoad();
@@ -48,43 +97,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     resultsContainer.innerHTML = '';
     currentIndex = -1;
   });
-
-  // Get the active windows
-  const windows = await activeWin.getOpenWindows();
-  let filteredWindows = windows.filter(w => w.owner.name !== 'System');
-
-  searchInput.addEventListener('input', () => {
-    const query = searchInput.value.toLowerCase();
-    resultsContainer.innerHTML = '';
-    currentIndex = -1;
-
-    const matchedWindows = filteredWindows.filter(w => w.title.toLowerCase().includes(query));
-    matchedWindows.forEach((window, index) => {
-      const windowElement = document.createElement('div');
-      windowElement.textContent = `${window.title} (PID: ${window.owner.processId})`;
-      windowElement.classList.add('p-2', 'hover:bg-gray-700', 'cursor-pointer');
-      windowElement.dataset.index = index;
-      windowElement.addEventListener('click', () => {
-        bringWindowToFront(window);
-      });
-      resultsContainer.appendChild(windowElement);
-    });
-  });
-
-  function bringWindowToFront(window) {
-    console.log(`Attempting to bring window to front: ${window.title} (PID: ${window.owner.processId})`);
-    
-    const windows = windowManager.getWindows();
-    const windowToFocus = windows.find(w => w.processId === window.owner.processId);
-    
-    if (windowToFocus) {
-      console.log(`Found window: ${windowToFocus.getTitle()} (PID: ${windowToFocus.processId})`);
-      windowToFocus.bringToTop();
-      
-      // Hide the main window instead of minimizing
-      ipcRenderer.send('hide-window');
-    } else {
-      console.log(`Window not found for PID: ${window.owner.processId}`);
-    }
-  }
 });

@@ -17,13 +17,23 @@
       background: rgba(255, 255, 255, 0.1); /* Semi-transparent result background */
       margin-bottom: 4px;
     }
+    .custom-scrollbar {
+      max-height: 400px;
+      overflow-y: auto;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* Internet Explorer 10+ */
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
   </style>
 </head>
 <body class="bg-transparent text-white">
   <div class="container mx-auto p-4">
     <div id="sysInfo" class="mb-4 text-sm"></div>
     <input id="search" type="text" placeholder="Search for an app..." class="w-full p-2 rounded text-white">
-    <div id="results" class="mt-4"></div>
+    <div id="results" class="mt-4 custom-scrollbar"></div>
   </div>
   <script src="renderer.js"></script>
 </body>

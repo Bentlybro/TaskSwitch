@@ -26,6 +26,7 @@ function createWindow() {
   mainWindow.on('show', () => {
     mainWindow.webContents.send('focus-search-input');
     mainWindow.webContents.send('clear-search-input');
+    mainWindow.webContents.send('window-shown'); // Add this line
   });
 
   // Hide the window when it loses focus
