@@ -1,8 +1,11 @@
 const { app, BrowserWindow, globalShortcut, ipcMain } = require('electron');
 const path = require('path');
 const { exec } = require('child_process');
+const { Tray, Menu } = require('electron');
+const fs = require('fs');
 
 let mainWindow;
+let tray = null;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -35,8 +38,19 @@ function createWindow() {
   });
 }
 
+function createTray() {
+  tray = new Tray(path.join(__dirname, 'icon.png'));
+  const contextMenu = Menu.buildFromTemplate([
+    { label: 'Show App', click: () => mainWindow.show() },
+    { label: 'Quit', click: () => app.quit() }
+  ]);
+  tray.setToolTip('App Switcher');
+  tray.setContextMenu(contextMenu);
+}
+
 app.whenReady().then(() => {
   createWindow();
+  createTray();
 
   // Register a global shortcut
   globalShortcut.register('CommandOrControl+Shift+P', () => {
@@ -69,5 +83,11 @@ app.on('will-quit', () => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
+  }
+});
+
+app.on('before-quit', () => {
+  if (tray) {
+    tray.destroy();
   }
 });
