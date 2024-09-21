@@ -12,10 +12,22 @@
     #search {
       background: rgba(255, 255, 255, 0.1); /* Semi-transparent input background */
       border: none;
+      color: white;
+      border-radius: 10px;
+      padding: 10px;
+      transition: all 0.3s ease;
     }
     #results div {
       background: rgba(255, 255, 255, 0.1); /* Semi-transparent result background */
       margin-bottom: 4px;
+      color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+      padding: 10px;
+      transition: all 0.3s ease;
+    }
+    #results div:hover {
+      background: rgba(255, 255, 255, 0.2);
     }
     .custom-scrollbar {
       max-height: 400px;
@@ -29,7 +41,17 @@
 </head>
 <body class="bg-transparent text-white">
   <div class="container mx-auto p-4">
-    <div id="sysInfo" class="mb-4 text-sm"></div>
+    <div id="sysInfo" class="mb-4 text-sm flex items-center justify-between">
+      <div id="cpuInfo" class="flex items-center">
+        <span>CPU: </span>
+        <svg id="cpuGraph" width="50" height="20" class="ml-2"></svg>
+      </div>
+      <div id="timeInfo" class="flex items-center"></div>
+      <div id="ramInfo" class="flex items-center">
+        <span>RAM: </span>
+        <svg id="ramGraph" width="50" height="20" class="ml-2"></svg>
+      </div>
+    </div>
     <input id="search" type="text" placeholder="Search for an app..." class="w-full p-2 rounded text-white">
     <div id="results" class="mt-4 custom-scrollbar"></div>
   </div>
