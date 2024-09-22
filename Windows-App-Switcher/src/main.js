@@ -1,4 +1,4 @@
-const { app, BrowserWindow, globalShortcut, ipcMain } = require('electron');
+const { app, BrowserWindow, globalShortcut, ipcMain, Notification } = require('electron');
 const path = require('path');
 const { exec } = require('child_process');
 const { Tray, Menu } = require('electron');
@@ -227,13 +227,14 @@ app.whenReady().then(() => {
     pomodoroWindow.hide();
   });
 
-  // Handle show-notification request
+  // Add this function to create a notification
+  function showNotification(title, body) {
+    new Notification({ title, body }).show();
+  }
+
+  // Add this IPC listener
   ipcMain.on('show-notification', (event, message) => {
-    const notification = new Notification({
-      title: 'Pomodoro Timer',
-      body: message
-    });
-    notification.show();
+    showNotification('Pomodoro Timer', message);
   });
 });
 
