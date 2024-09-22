@@ -53,7 +53,7 @@ function createTray() {
 
 function createTodoWindow() {
   todoWindow = new BrowserWindow({
-    width: 400,
+    width: 800,
     height: 600,
     webPreferences: {
       nodeIntegration: true,
@@ -174,6 +174,13 @@ app.whenReady().then(() => {
   ipcMain.on('close-settings-window', () => {
     if (settingsWindow) {
       settingsWindow.close();
+    }
+  });
+
+  // Hide todo window when it loses focus
+  ipcMain.on('hide-todo-window', () => {
+    if (todoWindow) {
+      todoWindow.hide();
     }
   });
 });

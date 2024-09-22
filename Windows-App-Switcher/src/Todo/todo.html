@@ -9,24 +9,55 @@
     body {
       background: rgba(0, 0, 0, 0.5);
     }
+    .container {
+      max-width: 800px;
+    }
     #todoInput, #todoList div {
       background: rgba(255, 255, 255, 0.1);
       border: none;
       color: white;
       border-radius: 10px;
       padding: 10px;
-      margin-bottom: 4px;
+      margin-bottom: 8px;
       transition: all 0.3s ease;
     }
     #todoList div:hover {
       background: rgba(255, 255, 255, 0.2);
     }
+    .edit-input, .status-select {
+      background: rgba(0, 0, 0, 0.7);
+      border: none;
+      color: white;
+      border-radius: 5px;
+      padding: 5px;
+      margin-right: 5px;
+    }
+    .status-select option {
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+    }
+    .status-todo { color: #f59e0b; }
+    .status-wip { color: #3b82f6; }
+    .status-done { color: #10b981; }
+    .status-late { color: #ef4444; }
+    .todo-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .todo-text {
+      flex-grow: 1;
+      margin: 0 10px;
+    }
+    .todo-actions button {
+      margin-left: 5px;
+    }
   </style>
 </head>
 <body class="bg-transparent text-white">
   <div class="container mx-auto p-4">
-    <input id="todoInput" type="text" placeholder="Add a new task..." class="w-full p-2 rounded text-white">
-    <div id="todoList" class="mt-4"></div>
+    <input id="todoInput" type="text" placeholder="Add a new task..." class="w-full p-3 rounded text-white text-lg">
+    <div id="todoList" class="mt-6"></div>
   </div>
   <script src="todoRenderer.js"></script>
 </body>
