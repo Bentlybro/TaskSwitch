@@ -1,6 +1,6 @@
-# App Switcher
+# TaskSwitch
 
-App Switcher is an Electron-based application that allows users to quickly switch between open windows, manage tasks, and track time using a Pomodoro timer.
+TaskSwitch is an Electron-based application that allows users to quickly switch between open windows, manage tasks, and track time using a Pomodoro timer.
 
 ## Features
 
@@ -12,7 +12,7 @@ App Switcher is an Electron-based application that allows users to quickly switc
 - Settings: Customize hotkeys and application behavior
 - Cross-platform: Works on Windows, macOS, and Linux
 
-![App Switcher Screenshot](https://github.com/user-attachments/assets/3bab8a86-c8ac-4841-99ec-b364a8f64006)
+![TaskSwitch Screenshot](https://github.com/user-attachments/assets/3bab8a86-c8ac-4841-99ec-b364a8f64006)
 
 ## Setup Guide
 
@@ -83,15 +83,10 @@ To build the application for your platform, use one of the following commands:
 ## Dependencies
 
 - active-win: Used to retrieve information about the currently active window and list all open windows across different platforms (Windows, macOS, Linux).
-
 - electron-store: Provides a simple persistent data storage solution for Electron apps. It's likely used to save user preferences, settings, and possibly the state of the to-do list.
-
 - node-window-manager: A library for managing windows in Windows, macOS, and Linux. It's used to bring selected windows to the foreground when switching applications.
-
 - ps-list: A cross-platform library to get a list of running processes. This might be used to gather additional information about running applications.
-
 - ref-napi: A library for working with native C++ types and pointers in Node.js. It's likely a dependency for some of the other libraries that interact with the operating system at a low level.
-
 - systeminformation: Used to retrieve detailed hardware, system and OS information. In your app, it's primarily used to get real-time CPU and RAM usage information.
 
 ## Contributing
