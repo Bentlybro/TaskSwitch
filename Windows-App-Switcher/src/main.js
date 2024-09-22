@@ -6,6 +6,7 @@ const fs = require('fs');
 
 let mainWindow;
 let tray = null;
+let todoWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -48,19 +49,48 @@ function createTray() {
   tray.setContextMenu(contextMenu);
 }
 
+function createTodoWindow() {
+  todoWindow = new BrowserWindow({
+    width: 400,
+    height: 600,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+    show: false,
+    frame: false,
+    transparent: true,
+    opacity: 1,
+    alwaysOnTop: true,
+  });
+
+  todoWindow.loadFile('src/Todo/todo.html');
+
+  todoWindow.on('blur', () => {
+    todoWindow.hide();
+  });
+}
+
 app.whenReady().then(() => {
   createWindow();
+  createTodoWindow();
   createTray();
 
-  // Register a global shortcut
+  // Register global shortcuts
   globalShortcut.register('CommandOrControl+Shift+P', () => {
     mainWindow.show();
     mainWindow.focus();
   });
 
+  globalShortcut.register('CommandOrControl+Shift+T', () => {
+    todoWindow.show();
+    todoWindow.focus();
+  });
+
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
+      createTodoWindow();
     }
   });
 
@@ -73,7 +103,14 @@ app.whenReady().then(() => {
   ipcMain.on('hide-window', () => {
     mainWindow.hide();
   });
+
+  // Listen for hide-todo-window event
+  ipcMain.on('hide-todo-window', () => {
+    todoWindow.hide();
+  });
 });
+
+
 
 app.on('will-quit', () => {
   // Unregister all shortcuts.
