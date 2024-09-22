@@ -7,6 +7,7 @@ const fs = require('fs');
 let mainWindow;
 let tray = null;
 let todoWindow;
+let settingsWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -43,6 +44,7 @@ function createTray() {
   tray = new Tray(path.join(__dirname, 'icon.png'));
   const contextMenu = Menu.buildFromTemplate([
     { label: 'Show App', click: () => mainWindow.show() },
+    { label: 'Settings', click: () => settingsWindow.show() },
     { label: 'Quit', click: () => app.quit() }
   ]);
   tray.setToolTip('App Switcher');
@@ -71,42 +73,101 @@ function createTodoWindow() {
   });
 }
 
+function createSettingsWindow() {
+  settingsWindow = new BrowserWindow({
+    width: 400,
+    height: 600,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+    show: false,
+    frame: false,
+    transparent: true,
+    opacity: 1,
+    alwaysOnTop: true,
+  });
+
+  settingsWindow.loadFile('src/Settings/settings.html');
+
+  settingsWindow.on('blur', () => {
+    settingsWindow.hide();
+  });
+}
+
+function updateGlobalShortcuts(newSettings) {
+  globalShortcut.unregisterAll();
+
+  const registerShortcut = (accelerator, callback) => {
+    try {
+      globalShortcut.register(accelerator, callback);
+    } catch (error) {
+      console.error(`Failed to register shortcut: ${accelerator}`, error);
+    }
+  };
+
+  registerShortcut(newSettings.appSwitcherHotkey, () => {
+    mainWindow.show();
+    mainWindow.focus();
+  });
+
+  registerShortcut(newSettings.todoHotkey, () => {
+    todoWindow.show();
+    todoWindow.focus();
+  });
+
+  registerShortcut('CommandOrControl+Shift+O', () => {
+    settingsWindow.show();
+    settingsWindow.focus();
+  });
+}
+
 app.whenReady().then(() => {
   createWindow();
   createTodoWindow();
   createTray();
 
-  // Register global shortcuts
-  globalShortcut.register('CommandOrControl+Shift+P', () => {
-    mainWindow.show();
-    mainWindow.focus();
+  // Initial settings
+  const initialSettings = {
+    appSwitcherHotkey: 'CommandOrControl+Shift+P',
+    todoHotkey: 'CommandOrControl+Shift+T',
+    theme: 'dark',
+    startAtLogin: false
+  };
+
+  updateGlobalShortcuts(initialSettings);
+
+  createSettingsWindow();
+
+  // Register global shortcut for settings
+  globalShortcut.register('CommandOrControl+Shift+O', () => {
+    settingsWindow.show();
+    settingsWindow.focus();
   });
 
-  globalShortcut.register('CommandOrControl+Shift+T', () => {
-    todoWindow.show();
-    todoWindow.focus();
+  // Listen for hide-settings-window event
+  ipcMain.on('hide-settings-window', () => {
+    settingsWindow.hide();
   });
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-      createTodoWindow();
-    }
+  // Handle get-settings request
+  ipcMain.on('get-settings', (event) => {
+    const settings = {
+      appSwitcherHotkey: 'CommandOrControl+Shift+P',
+      todoHotkey: 'CommandOrControl+Shift+T',
+      theme: 'dark',
+      startAtLogin: false
+    };
+    event.reply('settings', settings);
   });
 
-  // Listen for minimize-window event
-  ipcMain.on('minimize-window', () => {
-    mainWindow.minimize();
-  });
-
-  // Listen for hide-window event
-  ipcMain.on('hide-window', () => {
-    mainWindow.hide();
-  });
-
-  // Listen for hide-todo-window event
-  ipcMain.on('hide-todo-window', () => {
-    todoWindow.hide();
+  // Handle save-settings request
+  ipcMain.on('save-settings', (event, newSettings) => {
+    console.log('New settings:', newSettings);
+    updateGlobalShortcuts(newSettings);
+    // Here you would save the settings to a file or database
+    // For now, we'll just send a confirmation back to the renderer
+    event.reply('settings-saved', 'Settings saved successfully');
   });
 });
 
