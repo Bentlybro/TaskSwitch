@@ -1,5 +1,5 @@
 {
-  "name": "app-switcher",
+  "name": "taskswitch",
   "version": "1.0.0",
   "main": "src/main.js",
   "scripts": {
@@ -25,8 +25,8 @@
     "systeminformation": "^5.23.5"
   },
   "build": {
-    "appId": "com.Bentlybro.appswitcher",
-    "productName": "App Switcher",
+    "appId": "com.Bentlybro.TaskSwitch",
+    "productName": "TaskSwitch",
     "files": [
       "src/**/*",
       "package.json",
