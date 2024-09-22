@@ -7,6 +7,7 @@ const fs = require('fs');
 let mainWindow;
 let tray = null;
 let todoWindow;
+let pomodoroWindow;
 let settingsWindow;
 
 function createWindow() {
@@ -45,6 +46,7 @@ function createTray() {
   const contextMenu = Menu.buildFromTemplate([
     { label: 'Show App', click: () => mainWindow.show() },
     { label: 'Settings', click: () => settingsWindow.show() },
+    { label: 'Pomodoro Timer', click: () => pomodoroWindow.show() },
     { label: 'Quit', click: () => app.quit() }
   ]);
   tray.setToolTip('App Switcher');
@@ -70,6 +72,28 @@ function createTodoWindow() {
 
   todoWindow.on('blur', () => {
     todoWindow.hide();
+  });
+}
+
+function createPomodoroWindow() {
+  pomodoroWindow = new BrowserWindow({
+    width: 400,
+    height: 300,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+    show: false,
+    frame: false,
+    transparent: true,
+    opacity: 1,
+    alwaysOnTop: true,
+  });
+
+  pomodoroWindow.loadFile('src/Pomodoro/pomodoro.html');
+
+  pomodoroWindow.on('blur', () => {
+    pomodoroWindow.hide();
   });
 }
 
@@ -116,6 +140,11 @@ function updateGlobalShortcuts(newSettings) {
     todoWindow.focus();
   });
 
+  registerShortcut(newSettings.pomodoroHotkey, () => {
+    pomodoroWindow.show();
+    pomodoroWindow.focus();
+  });
+
   registerShortcut('CommandOrControl+Shift+O', () => {
     settingsWindow.show();
     settingsWindow.focus();
@@ -125,12 +154,14 @@ function updateGlobalShortcuts(newSettings) {
 app.whenReady().then(() => {
   createWindow();
   createTodoWindow();
+  createPomodoroWindow();
   createTray();
 
   // Initial settings
   const initialSettings = {
     appSwitcherHotkey: 'CommandOrControl+Shift+P',
     todoHotkey: 'CommandOrControl+Shift+T',
+    pomodoroHotkey: 'CommandOrControl+Shift+M',
     theme: 'dark',
     startAtLogin: false
   };
@@ -145,6 +176,12 @@ app.whenReady().then(() => {
     settingsWindow.focus();
   });
 
+  // Register global shortcut for Pomodoro Timer
+  globalShortcut.register('CommandOrControl+Shift+M', () => {
+    pomodoroWindow.show();
+    pomodoroWindow.focus();
+  });
+
   // Listen for hide-settings-window event
   ipcMain.on('hide-settings-window', () => {
     settingsWindow.hide();
@@ -155,6 +192,7 @@ app.whenReady().then(() => {
     const settings = {
       appSwitcherHotkey: 'CommandOrControl+Shift+P',
       todoHotkey: 'CommandOrControl+Shift+T',
+      pomodoroHotkey: 'CommandOrControl+Shift+M',
       theme: 'dark',
       startAtLogin: false
     };
@@ -182,6 +220,20 @@ app.whenReady().then(() => {
     if (todoWindow) {
       todoWindow.hide();
     }
+  });
+
+  // Listen for hide-pomodoro-window event
+  ipcMain.on('hide-pomodoro-window', () => {
+    pomodoroWindow.hide();
+  });
+
+  // Handle show-notification request
+  ipcMain.on('show-notification', (event, message) => {
+    const notification = new Notification({
+      title: 'Pomodoro Timer',
+      body: message
+    });
+    notification.show();
   });
 });
 

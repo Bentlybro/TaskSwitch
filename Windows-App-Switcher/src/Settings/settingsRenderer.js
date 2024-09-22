@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const startAtLoginCheckbox = document.getElementById('startAtLogin');
   const recordAppSwitcherBtn = document.getElementById('recordAppSwitcher');
   const recordTodoBtn = document.getElementById('recordTodo');
+  const pomodoroHotkeyInput = document.getElementById('pomodoroHotkey');
+  const recordPomodoroBtn = document.getElementById('recordPomodoro');
 
   let isRecording = false;
   let currentRecordingInput = null;
@@ -18,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
   ipcRenderer.on('settings', (event, settings) => {
     appSwitcherHotkeyInput.value = settings.appSwitcherHotkey || 'CommandOrControl+Shift+P';
     todoHotkeyInput.value = settings.todoHotkey || 'CommandOrControl+Shift+T';
+    pomodoroHotkeyInput.value = settings.pomodoroHotkey || 'CommandOrControl+Shift+M';
     startAtLoginCheckbox.checked = settings.startAtLogin || false;
   });
 
@@ -37,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   recordAppSwitcherBtn.addEventListener('click', () => startRecording(appSwitcherHotkeyInput));
   recordTodoBtn.addEventListener('click', () => startRecording(todoHotkeyInput));
+  recordPomodoroBtn.addEventListener('click', () => startRecording(pomodoroHotkeyInput));
 
   document.addEventListener('keydown', (e) => {
     if (isRecording) {
@@ -62,6 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const newSettings = {
       appSwitcherHotkey: appSwitcherHotkeyInput.value,
       todoHotkey: todoHotkeyInput.value,
+      pomodoroHotkey: pomodoroHotkeyInput.value,
       startAtLogin: startAtLoginCheckbox.checked
     };
     ipcRenderer.send('save-settings', newSettings);
