@@ -18,8 +18,8 @@ TaskSwitch is an Electron-based application that allows users to quickly switch 
 
 1. Clone the repository:
    ```
-   git clone https://github.com/Bentlybro/Windows-App-Switcher.git
-   cd Windows-App-Switcher
+   git clone https://github.com/Bentlybro/TaskSwitch.git
+   cd TaskSwitch
    ```
 
 2. Install dependencies:
