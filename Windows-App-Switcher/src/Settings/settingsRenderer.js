@@ -65,6 +65,9 @@ document.addEventListener('DOMContentLoaded', () => {
       startAtLogin: startAtLoginCheckbox.checked
     };
     ipcRenderer.send('save-settings', newSettings);
+    
+    // Close the settings window
+    ipcRenderer.send('close-settings-window');
   });
 
   // Hide window when it loses focus

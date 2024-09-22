@@ -169,6 +169,13 @@ app.whenReady().then(() => {
     // For now, we'll just send a confirmation back to the renderer
     event.reply('settings-saved', 'Settings saved successfully');
   });
+
+  // Handle close-settings-window request
+  ipcMain.on('close-settings-window', () => {
+    if (settingsWindow) {
+      settingsWindow.close();
+    }
+  });
 });
 
 
