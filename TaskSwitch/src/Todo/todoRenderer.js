@@ -1,11 +1,17 @@
 const { ipcRenderer } = require('electron');
+const io = require('socket.io-client');
+
+const config = {
+  serverUrl: 'http://localhost:3001'
+};
+
+const socket = io(config.serverUrl);
 
 document.addEventListener('DOMContentLoaded', () => {
   const todoInput = document.getElementById('todoInput');
   const todoList = document.getElementById('todoList');
-  let todos = JSON.parse(localStorage.getItem('todos') || '[]');
+  let todos = [];
 
-  // Focus the input field when the window opens
   todoInput.focus();
 
   function renderTodos() {
@@ -28,37 +34,42 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
       todoList.appendChild(todoElement);
 
-      // Add event listeners
       const statusSelect = todoElement.querySelector('.status-select');
-      statusSelect.addEventListener('change', (e) => updateStatus(index, e.target.value));
+      statusSelect.addEventListener('change', (e) => updateStatus(todo.id, e.target.value));
 
       const editBtn = todoElement.querySelector('.edit-btn');
-      editBtn.addEventListener('click', () => editTodo(todoElement, index));
+      editBtn.addEventListener('click', () => editTodo(todoElement, todo.id));
 
       const deleteBtn = todoElement.querySelector('.delete-btn');
-      deleteBtn.addEventListener('click', () => deleteTodo(index));
+      deleteBtn.addEventListener('click', () => deleteTodo(todo.id));
     });
   }
 
-  function saveTodos() {
-    localStorage.setItem('todos', JSON.stringify(todos));
+  async function addTodo(text) {
+    const newTodo = { id: Date.now().toString(), text, status: 'todo' };
+    const response = await fetch(`${config.serverUrl}/todos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newTodo),
+    });
+    if (response.ok) {
+      ipcRenderer.send('hide-todo-window');
+    }
   }
 
-  function addTodo(text) {
-    todos.push({ text, status: 'todo' });
-    renderTodos();
-    saveTodos();
-    // Close the window after adding a todo
-    ipcRenderer.send('hide-todo-window');
+  async function updateStatus(id, newStatus) {
+    const todo = todos.find(t => t.id === id);
+    if (todo) {
+      todo.status = newStatus;
+      await fetch(`${config.serverUrl}/todos/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(todo),
+      });
+    }
   }
 
-  function updateStatus(index, newStatus) {
-    todos[index].status = newStatus;
-    renderTodos();
-    saveTodos();
-  }
-
-  function editTodo(todoElement, index) {
+  async function editTodo(todoElement, id) {
     const span = todoElement.querySelector('span');
     const text = span.textContent;
     span.innerHTML = `
@@ -70,12 +81,18 @@ document.addEventListener('DOMContentLoaded', () => {
     
     input.focus();
     
-    saveBtn.addEventListener('click', () => {
+    saveBtn.addEventListener('click', async () => {
       const newText = input.value.trim();
       if (newText) {
-        todos[index].text = newText;
-        renderTodos();
-        saveTodos();
+        const todo = todos.find(t => t.id === id);
+        if (todo) {
+          todo.text = newText;
+          await fetch(`${config.serverUrl}/todos/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(todo),
+          });
+        }
       }
     });
 
@@ -86,10 +103,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function deleteTodo(index) {
-    todos.splice(index, 1);
-    renderTodos();
-    saveTodos();
+  async function deleteTodo(id) {
+    await fetch(`${config.serverUrl}/todos/${id}`, {
+      method: 'DELETE',
+    });
   }
 
   todoInput.addEventListener('keypress', (e) => {
@@ -99,9 +116,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  renderTodos();
+  socket.on('todosUpdated', (updatedTodos) => {
+    todos = updatedTodos;
+    renderTodos();
+  });
 
-  // Hide window when it loses focus
   window.addEventListener('blur', () => {
     ipcRenderer.send('hide-todo-window');
   });
